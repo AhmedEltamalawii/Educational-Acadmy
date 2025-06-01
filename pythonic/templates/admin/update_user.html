@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Update User</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="fname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="fname" name="fname" value="{{ user.fname }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lname" name="lname" value="{{ user.lname }}" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password (leave blank to keep current)</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password">
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+                    <label class="form-check-label" for="is_admin">Admin User</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update User</button>
+                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %} 

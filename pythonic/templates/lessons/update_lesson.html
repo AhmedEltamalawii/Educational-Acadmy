@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">Update Lesson</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('lessons.update_lesson', lesson_id=lesson.id) }}"
+                        enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ lesson.title }}"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="10"
+                                required>{{ lesson.content }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="course_id" class="form-label">Course</label>
+                            <select class="form-control" id="course_id" name="course_id" required>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}" {% if course.id==lesson.course_id %}selected{% endif %}>
+                                    {{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="thumbnail" class="form-label">Thumbnail</label>
+                            <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                            {% if lesson.thumbnail != 'default_thumbnail.jpg' %}
+                            <small class="text-muted">Current thumbnail: {{ lesson.thumbnail }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Lesson</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,738 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Flash Messages (Modern Toast Notifications) -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="toast show align-items-center text-white bg-{{ category }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="bi {% if category == 'success' %}bi-check-circle{% elif category == 'danger' %}bi-exclamation-triangle{% else %}bi-info-circle{% endif %} me-2"></i>
+          {{ message }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+    {% endfor %}
+  {% endwith %}
+</div>
+
+<!-- Glassmorphism Hero Section -->
+<section class="hero-section text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(26,26,46,0.9) 0%, rgba(110,69,226,0.9) 100%), url('{{ url_for('static', filename='hero-bg.jpg') }}') center/cover no-repeat;">
+  <div class="container position-relative z-index-1 py-6">
+    <div class="row align-items-center">
+      <div class="col-lg-6" data-aos="fade-right" data-aos-duration="800">
+        <h1 class="display-3 fw-bold mb-4 text-gradient-animated">
+          <span class="typed-text" data-typed-items='["Learn To Code", "Master Python", "Build Projects", "Join Our Community"]'></span>
+        </h1>
+        <p class="lead mb-4 fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3)">
+          We focus on teaching programming in an intuitive and easy-to-follow way.
+          All you need is dedication and passion for learning!
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a class="btn btn-danger btn-lg px-4 py-3 rounded-pill fw-bold btn-pulse"
+            href="https://www.youtube.com/channel/UCEsvQ6d7qsnOSNXtccIzScQ?sub_confirmation=1" target="_blank">
+            <i class="bi bi-youtube me-2"></i>Subscribe
+          </a>
+          <a class="btn btn-glass btn-lg px-4 py-3 rounded-pill fw-bold btn-shine"
+            href="{{ url_for('register') }}">
+            <i class="bi bi-person-plus me-2"></i>Join Now
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="800">
+        <div class="floating-3d">
+          <img class="img-fluid floating" src="{{url_for('static', filename='showcase.svg')}}" alt="Coding illustration">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-shapes">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+    <div class="shape-3"></div>
+  </div>
+</section>
+
+<!-- Courses Section with Modern Search -->
+<section class="courses-section py-6 position-relative bg-blur">
+  <div class="container">
+    <div class="text-center mb-6" data-aos="fade-up">
+      <h2 class="display-4 fw-bold mb-3 text-gradient">
+        {% if is_search %}
+        <i class="bi bi-search me-2"></i> Results for "{{ search_query }}"
+        {% else %}
+        <i class="bi bi-stars me-2"></i> Featured Courses
+        {% endif %}
+      </h2>
+      
+      <!-- Modern Search Form -->
+      <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+          <form action="{{ url_for('search_courses') }}" method="GET" class="search-form-glass" data-aos="fade-up" data-aos-delay="100">
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-0"><i class="bi bi-search"></i></span>
+              <input type="text" name="query" class="form-control form-control-lg border-0 bg-transparent" 
+                     placeholder="Search courses, technologies, or topics..." 
+                     value="{{ search_query if is_search else '' }}"
+                     required minlength="2"
+                     aria-label="Search courses">
+              <button class="btn btn-primary px-4" type="submit" id="search-button">
+                Search
+              </button>
+              {% if is_search %}
+              <a href="{{ url_for('home') }}" class="btn btn-outline-light px-3">
+                <i class="bi bi-x-lg"></i>
+              </a>
+              {% endif %}
+            </div>
+          </form>
+          
+          <!-- Categories Quick Filter -->
+          <div class="categories-scroller mt-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="d-flex flex-nowrap overflow-auto py-2">
+              <a href="{{ url_for('course_details', course_name='Python') }}" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                <i class="bi bi-filetype-py me-1"></i> Python
+              </a>
+              <a href="{{ url_for('course_details', course_name='Web Design') }}" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                <i class="bi bi-code-square me-1"></i> Web Design
+              </a>
+              <a href="{{ url_for('course_details', course_name='Data Analysis') }}" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                <i class="bi bi-bar-chart-line me-1"></i> Data
+              </a>
+              <a href="{{ url_for('course_details', course_name='Machine Learning') }}" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                <i class="bi bi-cpu me-1"></i> AI/ML
+              </a>
+              <a href="{{ url_for('course_details', course_name='Blockchain') }}" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                <i class="bi bi-currency-bitcoin me-1"></i> Blockchain
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Search Results Info -->
+      {% if is_search %}
+      <div class="alert alert-glass mt-3" data-aos="fade-up" data-aos-delay="150">
+        <i class="bi bi-info-circle me-2"></i>
+        Found <strong>{{ courses|length }}</strong> results for "{{ search_query }}"
+        {% if courses|length >= 20 %}
+        - Showing top 20 matches
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Course Cards - Modern Grid -->
+    <div class="row g-4">
+      {% for course in courses %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3" data-aos="flip-up" data-aos-delay="{{ loop.index * 50 }}">
+        <div class="card card-glass h-100 border-0 overflow-hidden shadow-hover">
+          <div class="card-hover-effect">
+            <a href="{{ url_for('course_details', course_name=course.name) }}" class="text-decoration-none text-white">
+              <div class="card-body p-4 position-relative">
+                <!-- Course Difficulty Badge -->
+                <span class="badge bg-{{ ['success', 'warning', 'danger'] | random }} position-absolute top-0 start-0 m-3">
+                  {{ ['Beginner', 'Intermediate', 'Advanced'] | random }}
+                </span>
+                
+                <!-- Course Icon with Neumorphism Effect -->
+                <div class="icon-wrapper bg-glass rounded-circle p-3 mb-3 mx-auto icon-float">
+                  <img src="{{url_for('static', filename=course.icon)}}" alt="{{course.name}}" class="img-fluid" style="width: 60px;">
+                </div>
+                
+                <h3 class="h5 mb-3 course-name">{{course.name}}</h3>
+                <p class="text-light mb-4 opacity-75 course-description">{{course.description}}</p>
+                
+                <!-- Progress Indicator -->
+                <div class="progress mb-3 bg-glass" style="height: 6px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ range(20, 100) | random }}%"></div>
+                </div>
+                
+                <!-- Learn More Button with Icon Transition -->
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="small text-light opacity-75">
+                    <i class="bi bi-clock me-1"></i> {{ range(4, 20) | random }}h
+                  </span>
+                  <a href="{{ url_for('course_details', course_name=course.name) }}" class="btn btn-sm btn-primary rounded-pill btn-icon-animate">
+                    Learn More <i class="bi bi-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if not courses %}
+    <div class="text-center py-6" data-aos="fade-up">
+      <div class="empty-state">
+        <img src="{{ url_for('static', filename='empty-search.svg') }}" alt="No results" class="img-fluid mb-4" style="max-width: 300px;">
+        <h3 class="h4 mb-3">No courses found</h3>
+        <p class="text-muted mb-4">Try adjusting your search or filter to find what you're looking for.</p>
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg rounded-pill">
+          <i class="bi bi-arrow-left me-2"></i> Back to all courses
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <!-- Floating Particles Background -->
+  <div class="course-particles">
+    {% for i in range(30) %}
+    <div class="particle" style="--i: {{ i }}"></div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Latest Lessons - Card Slider -->
+<section class="lessons-section py-6 bg-dark-2 position-relative">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
+      <div>
+        <h2 class="display-5 fw-bold text-white mb-2">Latest Lessons</h2>
+        <p class="lead text-light opacity-75 mb-0">Fresh content added regularly</p>
+      </div>
+      <a href="#" class="btn btn-outline-light rounded-pill">
+        View All <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+    
+    <div class="lessons-slider" data-aos="fade-up" data-aos-delay="100">
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {% for lesson in lessons %}
+          <div class="swiper-slide">
+            <div class="card card-glass h-100 border-0 overflow-hidden shadow-hover">
+              <div class="card-hover-effect">
+                <div class="position-relative">
+                  <img src="{{url_for('static', filename=lesson.thumbnail)}}" class="card-img-top img-scale" alt="{{lesson.title}}">
+                  <div class="badge bg-danger position-absolute top-0 end-0 m-3 pulse">New</div>
+                  <div class="play-button position-absolute top-50 start-50 translate-middle">
+                    <i class="bi bi-play-circle-fill"></i>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title text-white">
+                    <a href="#" class="text-decoration-none stretched-link">{{lesson.title}}</a>
+                  </h5>
+                  <p class="card-text text-light opacity-75">In: {{lesson.course}}</p>
+                  <div class="d-flex align-items-center mt-3">
+                    <img src="{{url_for('static', filename='default.jpg')}}" class="rounded-circle me-2" width="36" alt="Author">
+                    <div>
+                      <span class="small text-light">By {{lesson.author}}</span><br>
+                      <span class="small text-muted">{{ range(1, 30) | random }} days ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Floating Stars Background -->
+  <div class="lesson-stars">
+    {% for i in range(40) %}
+    <div class="star" style="--i: {{ i }}"></div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Newsletter Section with Parallax -->
+<section class="newsletter-section py-6 position-relative parallax-section" style="background-image: url('{{ url_for('static', filename='newsletter-bg.jpg') }}')">
+  <div class="container position-relative z-index-1">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center" data-aos="zoom-in">
+        <div class="card card-glass border-0 p-4 p-md-5">
+          <h2 class="display-5 fw-bold mb-3 text-gradient">Stay Updated</h2>
+          <p class="lead mb-4 text-light opacity-75">Subscribe for the latest tutorials, coding tips, and exclusive content</p>
+          
+          <form class="row g-3 justify-content-center">
+            <div class="col-md-8">
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-glass border-0"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control form-control-lg border-0 bg-glass" placeholder="Your Email Address">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary btn-lg w-100 btn-neon">
+                Subscribe
+              </button>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="newsletterCheck" checked>
+                <label class="form-check-label small text-light opacity-75" for="newsletterCheck">
+                  I agree to receive emails with updates and offers
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="overlay"></div>
+</section>
+
+<style>
+  /* Base Styles */
+  :root {
+    --primary: #6e45e2;
+    --secondary: #88d3ce;
+    --dark: #1a1a2e;
+    --light: #f8f9fa;
+    --danger: #ff4d4d;
+    --warning: #ffc107;
+  }
+  
+  /* Hero Section */
+  .hero-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #6e45e2 100%);
+    padding: 6rem 0;
+    overflow: hidden;
+  }
+  
+  .hero-shapes .shape-1 {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  .hero-shapes .shape-2 {
+    position: absolute;
+    bottom: 10%;
+    right: 10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(104, 69, 226, 0.2);
+    border-radius: 30% 70% 70% 30%/30% 30% 70% 70%;
+    filter: blur(50px);
+    animation: morph 12s ease-in-out infinite;
+  }
+  
+  .hero-shapes .shape-3 {
+    position: absolute;
+    top: 50%;
+    right: 30%;
+    width: 150px;
+    height: 150px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    transform: rotate(45deg);
+    animation: rotate 20s linear infinite;
+  }
+  
+  /* Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  @keyframes morph {
+    0% { border-radius: 30% 70% 70% 30%/30% 30% 70% 70%; }
+    50% { border-radius: 58% 42% 75% 25%/76% 46% 54% 24%; }
+    100% { border-radius: 30% 70% 70% 30%/30% 30% 70% 70%; }
+  }
+  
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .floating {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  /* Text Animations */
+  .animate-charcter {
+    background-image: linear-gradient(
+      -225deg,
+      #ff4d4d 0%,
+      #ffc107 29%,
+      #88d3ce 67%,
+      #6e45e2 100%
+    );
+    background-size: 200% auto;
+    color: #fff;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textclip 3s linear infinite;
+  }
+  
+  @keyframes textclip {
+    to {
+      background-position: 200% center;
+    }
+  }
+  
+  .text-flicker {
+    animation: flicker 3s linear infinite;
+  }
+  
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  /* Button Animations */
+  .btn-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 77, 77, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+  }
+  
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-shine:after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    opacity: 0;
+    transform: rotate(30deg);
+    background: rgba(255, 255, 255, 0.13);
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.13) 77%,
+      rgba(255, 255, 255, 0.5) 92%,
+      rgba(255, 255, 255, 0.0) 100%
+    );
+  }
+  
+  .btn-shine:hover:after {
+    opacity: 1;
+    left: 130%;
+    transition-property: left, top, opacity;
+    transition-duration: 0.7s, 0.7s, 0.15s;
+    transition-timing-function: ease;
+  }
+  
+  /* Social Media Section */
+  .social-section {
+    background: linear-gradient(135deg, #6e45e2 0%, #88d3ce 100%);
+  }
+  
+  .social-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .particle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: float-particle calc(15s * var(--i)) linear infinite;
+  }
+  
+  @keyframes float-particle {
+    0% {
+      transform: translateY(0) translateX(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100vh) translateX(100px);
+      opacity: 0;
+    }
+  }
+  
+  .btn-hover-glow:hover {
+    box-shadow: 0 0 15px rgba(255,255,255,0.7);
+  }
+  
+  /* Courses Section */
+  .courses-section {
+    background-color: #f8f9fa;
+  }
+  
+  .course-dots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(104, 69, 226, 0.1);
+    border-radius: 50%;
+    animation: float-dot calc(20s * var(--i)) linear infinite;
+  }
+  
+  @keyframes float-dot {
+    0% {
+      transform: translateY(0) translateX(0);
+    }
+    100% {
+      transform: translateY(-100vh) translateX(200px);
+    }
+  }
+  
+  .hover-3d {
+    transition: all 0.5s ease;
+    transform-style: preserve-3d;
+  }
+  
+  .hover-3d:hover {
+    transform: perspective(1000px) rotateY(10deg) rotateX(5deg) translateY(-10px);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+  }
+  
+  .icon-spin:hover {
+    animation: spin 1s linear;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .btn-border-animate {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  .btn-border-animate span {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .btn-border-animate:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #6e45e2, #88d3ce);
+    animation: borderAnimation 3s linear infinite;
+  }
+  
+  @keyframes borderAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Lessons Section */
+  .lessons-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #6e45e2 100%);
+  }
+  
+  .lesson-stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle calc(5s * var(--i)) linear infinite;
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+  
+  .hover-tilt:hover {
+    transform: perspective(1000px) rotateY(5deg) rotateX(2deg) translateY(-5px);
+    transition: all 0.3s ease;
+  }
+  
+  .img-scale {
+    transition: transform 0.5s ease;
+  }
+  
+  .hover-tilt:hover .img-scale {
+    transform: scale(1.05);
+  }
+  
+  .badge-pulse {
+    animation: pulse-badge 2s infinite;
+  }
+  
+  @keyframes pulse-badge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .author-bounce {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover .author-bounce {
+    animation: bounce 0.5s;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  .btn-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  /* Newsletter Section */
+  .newsletter-section {
+    background: linear-gradient(135deg, #88d3ce 0%, #6e45e2 100%);
+  }
+  
+  .newsletter-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+  }
+  
+  .wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-repeat: repeat no-repeat;
+    background-position: 0 bottom;
+    transform-origin: center bottom;
+  }
+  
+  .wave-1 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.25' fill='%23ffffff'%3E%3C/path%3E%3C/svg%3E");
+    animation: wave 10s linear infinite;
+  }
+  
+  .wave-2 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z' opacity='.5' fill='%23ffffff'%3E%3C/path%3E%3C/svg%3E");
+    animation: wave 15s linear infinite reverse;
+    opacity: 0.5;
+  }
+  
+  .wave-3 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z' fill='%23ffffff'%3E%3C/path%3E%3C/svg%3E");
+    animation: wave 20s linear infinite;
+    opacity: 0.7;
+  }
+  
+  @keyframes wave {
+    0% { transform: translateX(0) translateZ(0) scaleY(1); }
+    50% { transform: translateX(-25%) translateZ(0) scaleY(0.8); }
+    100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, #ff4d4d, #ffc107, #88d3ce, #6e45e2);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 8s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .input-glow:focus {
+    box-shadow: 0 0 10px rgba(104, 69, 226, 0.5);
+    border-color: #6e45e2;
+  }
+  
+  .btn-neon {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  
+  .btn-neon:hover {
+    box-shadow: 0 0 10px #6e45e2, 0 0 20px #6e45e2, 0 0 30px #6e45e2;
+  }
+  
+  /* Text Effects */
+  .text-stroke {
+    -webkit-text-stroke: 1px white;
+    color: transparent;
+  }
+  
+  .rainbow-text {
+    background: linear-gradient(to right, #ff4d4d, #ffc107, #88d3ce, #6e45e2, #ff4d4d);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 3s linear infinite;
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+</style>
+
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: false
+  });
+</script>
+
+{% endblock content %}

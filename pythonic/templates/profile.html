@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="content-section">
+                <div class="media">
+                    <img class="rounded-circle account-img"
+                        src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}">
+                    <div class="media-body">
+                        <h2 class="account-heading">{{ current_user.username }}</h2>
+                        <p class="text-secondary">{{ current_user.email }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group mt-4">
+                        <legend class="border-bottom mb-4">Profile Information</legend>
+                        <div class="form-group mb-3">
+                            {{ form.fname.label(class="form-control-label") }}
+                            {{ form.fname(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.lname.label(class="form-control-label") }}
+                            {{ form.lname(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.username.label(class="form-control-label") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.email.label(class="form-control-label") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.picture.label() }}
+                            {{ form.picture(class="form-control-file") }}
+                            {% if form.picture.errors %}
+                            {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span><br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </fieldset>
+                    <div class="form-group mb-3">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                    </div>
+                </form>
+                <div class="border-top pt-3 mt-4">
+                    <h4>Change Password</h4>
+                    <form method="POST" action="{{ url_for('change_password') }}">
+                        {{ password_form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            {{ password_form.current_password.label(class="form-control-label") }}
+                            {{ password_form.current_password(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ password_form.new_password.label(class="form-control-label") }}
+                            {{ password_form.new_password(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ password_form.confirm_new_password.label(class="form-control-label") }}
+                            {{ password_form.confirm_new_password(class="form-control") }}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ password_form.submit(class="btn btn-outline-warning") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="border-top pt-3 mt-4">
+                    <h4 class="text-danger">Delete Account</h4>
+                    <form method="POST" action="{{ url_for('delete_account') }}"
+                        onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+                        {{ delete_form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                {{ delete_form.confirm(class="form-check-input") }}
+                                {{ delete_form.confirm.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ delete_form.submit(class="btn btn-outline-danger") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="mt-4">
+                    <h4>Your Lessons</h4>
+                    {% if current_user.lessons %}
+                    <ul class="list-group">
+                        {% for lesson in current_user.lessons %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('lessons.view_lesson', lesson_id=lesson.id) }}">{{ lesson.title }}</a>
+                            <small class="text-muted">({{ lesson.date_posted.strftime('%Y-%m-%d') }})</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>You haven't created any lessons yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
